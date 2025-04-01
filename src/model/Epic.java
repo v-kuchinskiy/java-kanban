@@ -5,31 +5,42 @@ import java.util.List;
 
 public class Epic extends Task {
 
-    private final List<Integer> subtaskIds = new ArrayList<>();
+    private List<Subtask> subtasks;
 
-    public Epic(String name, String description, int id) {
-        super(name, description, Status.NEW, id);
+    public Epic(int id, String name, String description) {
+        super(id, name, description, Status.NEW);
+        this.subtasks = new ArrayList<>();
     }
 
-    public List<Integer> getSubtaskIds() {
-        return subtaskIds;
+    public List<Subtask> getSubtasks() {
+        return new ArrayList<>(subtasks);
     }
 
-    public void addSubtaskId(int subtaskId) {
-        subtaskIds.add(subtaskId);
+    public void addSubtask(Subtask subtask) {
+        if (subtask != null && subtask.getEpicId() == this.getId()) {
+            subtasks.add(subtask);
+        }
     }
 
-    public void removeSubtaskId(int subtaskId) {
-        subtaskIds.remove((Integer) subtaskId);
+    public void removeSubtask(int subtaskId) {
+        subtasks.removeIf(subtask -> subtask.getId() == subtaskId);
+    }
+
+    public void clearSubtasks() {
+        subtasks.clear();
     }
 
     @Override
     public String toString() {
-        return "model.Epic{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", status=" + status +
+        List<Integer> subtaskIds = new ArrayList<>();
+        for (Subtask subtask : subtasks) {
+            subtaskIds.add(subtask.getId());
+        }
+        return "Epic{" +
+                "id=" + getId() +
+                ", name='" + getName() + '\'' +
+                ", description='" + getDescription() + '\'' +
+                ", status=" + getStatus() +
                 ", subtaskIds=" + subtaskIds +
                 '}';
     }

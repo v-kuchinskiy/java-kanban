@@ -4,16 +4,16 @@ import java.util.Objects;
 
 public class Task {
 
-    protected String name;
-    protected String description;
-    protected Status status;
-    protected final int id;
+    private final int id;
+    private String name;
+    private String description;
+    private Status status;
 
-    public Task(String name, String description, Status status, int id) {
+    public Task(int id, String name, String description, Status status) {
+        this.id = id;
         this.name = name;
         this.description = description;
         this.status = status;
-        this.id = id;
     }
 
     public int getId() {
@@ -24,20 +24,20 @@ public class Task {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public String getDescription() {
         return description;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
     public Status getStatus() {
         return status;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public void setStatus(Status status) {
@@ -59,7 +59,7 @@ public class Task {
 
     @Override
     public String toString() {
-        return "model.Task{" +
+        return "Task{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
