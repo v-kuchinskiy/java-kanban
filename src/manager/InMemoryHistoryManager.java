@@ -1,6 +1,8 @@
 package manager;
 
 import model.*;
+
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -19,6 +21,6 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public List<Task> getHistory() {
-        return new LinkedList<>(history);
+        return new ArrayList<>(history);
     }
 }
