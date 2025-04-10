@@ -20,7 +20,7 @@ public class InMemoryHistoryManagerTest {
         List<Task> historyList = historyManager.getHistory();
 
         assertEquals(1, historyList.size());
-        assertEquals(Status.NEW, historyList.get(0).getStatus());
+        assertEquals(Status.NEW, historyList.getFirst().getStatus());
 
         Task updatedTask = new Task("Task", "Desc", Status.IN_PROGRESS);
         updatedTask.setId(initialTask.getId());
