@@ -1,7 +1,13 @@
 package manager;
 
-import model.*;
-import java.util.*;
+import model.Epic;
+import model.Status;
+import model.Subtask;
+import model.Task;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class InMemoryTaskManager implements TaskManager {
     private int nextId;
@@ -49,6 +55,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void deleteAllSubtasks() {
         subtasks.clear();
+
         for (Epic epic : epics.values()) {
             epic.getSubtaskIds().clear();
         }
@@ -63,6 +70,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Task getTaskById(int id) {
         Task task = tasks.get(id);
+
         if (task != null) {
             historyManager.add(task);
         }
@@ -72,6 +80,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Subtask getSubtaskById(int id) {
         Subtask subtask = subtasks.get(id);
+
         if (subtask != null) {
             historyManager.add(subtask);
         }
@@ -81,6 +90,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Epic getEpicById(int id) {
         Epic epic = epics.get(id);
+
         if (epic != null) {
             historyManager.add(epic);
         }
@@ -105,6 +115,7 @@ public class InMemoryTaskManager implements TaskManager {
             throw new IllegalArgumentException("Подзадача не может быть эпиком сама для себя");
         }
         subtasks.put(subtask.getId(), subtask);
+
         Epic epic = epics.get(subtask.getEpicId());
         if (epic != null) {
             epic.addSubtask(subtask.getId());
@@ -162,6 +173,7 @@ public class InMemoryTaskManager implements TaskManager {
     public void updateSubtask(Subtask subtask) {
         subtasks.put(subtask.getId(), subtask);
         Epic epic = epics.get(subtask.getEpicId());
+
         if (epic != null) {
             updateEpicStatus(epic.getId());
         }
