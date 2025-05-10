@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 
 public class InMemoryHistoryManager implements HistoryManager {
-
     private final Map<Integer, Node> nodeMap = new LinkedHashMap<>();
     private Node head;
     private Node tail;
