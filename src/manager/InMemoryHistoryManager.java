@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.Map;
 
 public class InMemoryHistoryManager implements HistoryManager {
-    //private static final int HISTORY_LIST_MAX_SIZE = 10;
-    //private final LinkedList<Task> history = new LinkedList<>();
 
     private final Map<Integer, Node> nodeMap = new LinkedHashMap<>();
     private Node head;
