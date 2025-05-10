@@ -1,10 +1,11 @@
-package tests;
-
-import model.*;
-import manager.*;
-
+import manager.InMemoryTaskManager;
+import model.Epic;
+import model.Status;
+import model.Subtask;
+import model.Task;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class InMemoryTaskManagerTest {
     @Test
