@@ -42,11 +42,11 @@ public interface TaskManager {
 
     void updateEpic(Epic epic);
 
-    void deleteTaskById(int id);
+    void deleteTask(int id);
 
-    void deleteSubtaskById(int id);
+    void deleteSubtask(int id);
 
-    void deleteEpicById(int id);
+    void deleteEpic(int id);
 
     List<Task> getHistory();
 }
