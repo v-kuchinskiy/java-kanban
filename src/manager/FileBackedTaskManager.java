@@ -156,11 +156,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 ? task.getDescription().replace("\"", "\"\"")
                 : "";
 
-        TaskType type = switch (task) {
-            case Epic e -> TaskType.EPIC;
-            case Subtask s -> TaskType.SUBTASK;
-            default -> TaskType.TASK;
-        };
+        TaskType type = task instanceof Epic ? TaskType.EPIC :
+                task instanceof Subtask ? TaskType.SUBTASK : TaskType.TASK;
 
         String baseFormat = String.format("%d,%s,%s,%s,\"%s\"",
                 task.getId(),
