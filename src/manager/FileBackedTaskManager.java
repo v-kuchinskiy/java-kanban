@@ -1,5 +1,6 @@
 package manager;
 
+import exceptions.ManagerLoadException;
 import exceptions.ManagerSaveException;
 import model.*;
 
@@ -16,85 +17,108 @@ import static model.Status.NEW;
 public class FileBackedTaskManager extends InMemoryTaskManager {
     private final String filePath;
 
+    private static final int MIN_REQUIRED_FIELDS = 5;
+    private static final int MIN_SUBTASK_FIELDS = 6;
+    private static final int ID_INDEX = 0;
+    private static final int TYPE_INDEX = 1;
+    private static final int NAME_INDEX = 2;
+    private static final int STATUS_INDEX = 3;
+    private static final int DESCRIPTION_INDEX = 4;
+    private static final int EPIC_ID_INDEX = 5;
+    private static final int NO_EPIC_ID = -1;
+
     public FileBackedTaskManager(String filePath) {
         super();
         this.filePath = filePath;
         loadFromFile();
     }
 
-    public static FileBackedTaskManager loadFromFile(File file) {
-        FileBackedTaskManager manager = new FileBackedTaskManager(file.getAbsolutePath());
-        manager.loadFromFile();
-        return manager;
-    }
-
     private void loadFromFile() {
         File file = new File(filePath);
+        if (file.exists()) {
+            FileBackedTaskManager loaded = loadFromFile(file);
+        }
+    }
 
-        if (!file.exists()) return;
+    static FileBackedTaskManager loadFromFile(File file) {
+        FileBackedTaskManager manager = new FileBackedTaskManager(file.getAbsolutePath());
+
+        if (!file.exists()) {
+            return manager;
+        }
 
         try {
             String content = Files.readString(file.toPath());
             String[] lines = content.split("\\R");
-            boolean headerPassed = false;
+            boolean isHeaderPassed = false;
 
             for (String line : lines) {
-                if (line.trim().isEmpty()) continue;
-
-                if (!headerPassed) {
-                    headerPassed = true;
+                if (line.trim().isEmpty()) {
                     continue;
                 }
 
-                if (!line.matches("^\\d+.*")) continue;
+                if (!isHeaderPassed) {
+                    isHeaderPassed = true;
+                    continue;
+                }
 
-                Task task = fromString(line);
-                if (task instanceof Epic) {
-                    addEpic((Epic) task);
-                } else if (task instanceof Subtask) {
-                    addSubtask((Subtask) task);
-                } else {
-                    addTask(task);
+                if (!line.matches("^\\d+.*")) {
+                    continue;
+                }
+
+                try {
+                    Task task = fromString(line);
+                    if (task instanceof Epic) {
+                        manager.addEpic((Epic) task);
+                    } else if (task instanceof Subtask) {
+                        manager.addSubtask((Subtask) task);
+                    } else {
+                        manager.addTask(task);
+                    }
+                } catch (IllegalArgumentException e) {
+                    throw new ManagerSaveException("Некорректная строка: " + line + ". Пропуск.");
                 }
             }
         } catch (IOException e) {
-            System.out.println("Ошибка при чтении файла: " + e.getMessage());
+            throw new ManagerLoadException("Ошибка при чтении файла: " + file.getAbsolutePath());
         }
+
+        return manager;
     }
 
-    private Task fromString(String line) {
+    private static Task fromString(String line) {
         String[] fields = line.split(",");
 
-        if (fields.length < 5) {
+        if (fields.length < MIN_REQUIRED_FIELDS) {
             throw new ManagerSaveException("Некорректная строка в файле: " + line);
         }
 
         int id;
-        id = Integer.parseInt(fields[0]);
+        id = Integer.parseInt(fields[ID_INDEX]);
 
         TaskType type;
-        type = TaskType.valueOf(fields[1]);
+        type = TaskType.valueOf(fields[TYPE_INDEX]);
 
-        String name = fields[2];
+        String name = fields[NAME_INDEX];
 
         Status status = NEW;
-        if (!fields[3].isEmpty()) {
-            status = Status.valueOf(fields[3]);
+        if (!fields[STATUS_INDEX].isEmpty()) {
+            status = Status.valueOf(fields[STATUS_INDEX]);
         }
 
         String description;
-        if (fields.length > 4) {
-            description = fields[4];
+        if (fields.length > DESCRIPTION_INDEX) {
+            description = fields[DESCRIPTION_INDEX];
         } else {
             description = "";
         }
 
-        int epicId = -1;
+        int epicId = NO_EPIC_ID;
         if (type == TaskType.SUBTASK) {
-            if (fields.length < 6 || fields[5].isEmpty()) {
+            if (fields.length < MIN_SUBTASK_FIELDS || fields[EPIC_ID_INDEX].isEmpty()) {
                 throw new ManagerSaveException("Отсутствует epicId для подзадачи");
             }
-            epicId = Integer.parseInt(fields[5]);
+            epicId = Integer.parseInt(fields[EPIC_ID_INDEX]);
         }
 
         switch (type) {
