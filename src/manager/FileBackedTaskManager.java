@@ -22,17 +22,17 @@ import java.util.function.Function;
 import static util.Status.NEW;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
-    final int MIN_REQUIRED_FIELDS = 7;
-    final int SUBTASK_REQUIRED_FIELDS = 8;
-    final int NO_EPIC_ID = -1;
-    final int ID_INDEX = 0;
-    final int TYPE_INDEX = 1;
-    final int NAME_INDEX = 2;
-    final int STATUS_INDEX = 3;
-    final int DESCRIPTION_INDEX = 4;
-    final int START_TIME_INDEX = 5;
-    final int DURATION_INDEX = 6;
-    final int EPIC_ID_INDEX = 7;
+    static final int MIN_REQUIRED_FIELDS = 7;
+    static final int SUBTASK_REQUIRED_FIELDS = 8;
+    static final int NO_EPIC_ID = -1;
+    static final int ID_INDEX = 0;
+    static final int TYPE_INDEX = 1;
+    static final int NAME_INDEX = 2;
+    static final int STATUS_INDEX = 3;
+    static final int DESCRIPTION_INDEX = 4;
+    static final int START_TIME_INDEX = 5;
+    static final int DURATION_INDEX = 6;
+    static final int EPIC_ID_INDEX = 7;
 
     private final String filePath;
 
