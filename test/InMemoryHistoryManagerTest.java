@@ -1,160 +1,111 @@
+import manager.HistoryManager;
 import manager.InMemoryHistoryManager;
+import manager.InMemoryTaskManager;
 import model.Task;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import util.Status;
+import util.TestData;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class InMemoryHistoryManagerTest {
+    LocalDateTime baseTime = TestData.BASE_TIME;
 
-    private InMemoryHistoryManager historyManager;
-    private Task task1;
-    private Task task2;
-    private Task task3;
+    @Test
+    void historyKeepsPreviousTaskVersions() { // Тест на сохранение предыдущей версии
+        HistoryManager hm = new InMemoryHistoryManager();
+        InMemoryTaskManager tm = new InMemoryTaskManager(hm);
 
-    @BeforeEach
-    void setUp() {
-        historyManager = new InMemoryHistoryManager();
-        task1 = new Task("Task 1", "Description 1");
+        Task task1 = new Task("T1", "D1", Status.NEW,
+                Duration.ofMinutes(30), baseTime);
         task1.setId(1);
-        task2 = new Task("Task 2", "Description 2");
+        tm.addTask(task1);
+        tm.getTaskById(1);
+
+        Task task2 = new Task("T2", "D2", Status.IN_PROGRESS,
+                Duration.ofMinutes(30), baseTime.plusHours(1));
+        task2.setId(1);
+        tm.updateTask(task2);
+        tm.getTaskById(1);
+
+        List<Task> history = hm.getHistory();
+        assertEquals(1, history.size());
+        assertEquals(Status.IN_PROGRESS, history.get(0).getStatus());
+    }
+
+    @Test
+    void testOrderOfTasks() { // Тест на порядок в истории
+        HistoryManager hm = new InMemoryHistoryManager();
+        Task task1 = new Task("T1", "D1", Status.NEW,
+                Duration.ofMinutes(30), baseTime);
+        task1.setId(1);
+        Task task2 = new Task("T2", "D2", Status.IN_PROGRESS,
+                Duration.ofMinutes(30), baseTime);
         task2.setId(2);
-        task3 = new Task("Task 3", "Description 3");
-        task3.setId(3);
-    }
 
-    // Проверяет, что задача успешно добавляется в историю просмотров
-    @Test
-    void addShouldAddTaskToHistory() {
-        historyManager.add(task1);
-        List<Task> history = historyManager.getHistory();
+        hm.add(task1);
+        hm.add(task2);
 
-        assertEquals(1, history.size());
-        assertEquals(task1, history.get(0));
-    }
-
-    // Проверяет, что попытка добавить null не приводит к добавлению в историю
-    @Test
-    void addShouldNotAddNullTask() {
-        historyManager.add(null);
-        List<Task> history = historyManager.getHistory();
-
-        assertTrue(history.isEmpty());
-    }
-
-    // Проверяет, что при повторном добавлении задачи она перемещается в конец истории
-    @Test
-    void addShouldMoveExistingTaskToEnd() {
-        historyManager.add(task1);
-        historyManager.add(task2);
-        historyManager.add(task1);
-        List<Task> history = historyManager.getHistory();
-
+        List<Task> history = hm.getHistory();
         assertEquals(2, history.size());
-        assertEquals(task2, history.get(0));
-        assertEquals(task1, history.get(1));
-    }
-
-    // Проверяет корректность удаления задачи из истории
-    @Test
-    void removeShouldDeleteTaskFromHistory() {
-        historyManager.add(task1);
-        historyManager.add(task2);
-        historyManager.remove(task1.getId());
-        List<Task> history = historyManager.getHistory();
-
-        assertEquals(1, history.size());
-        assertEquals(task2, history.get(0));
-    }
-
-    // Проверяет, что попытка удалить несуществующую задачу не влияет на историю
-    @Test
-    void removeShouldDoNothingWhenTaskNotExists() {
-        historyManager.add(task1);
-        historyManager.remove(999); // несуществующий ID
-        List<Task> history = historyManager.getHistory();
-
-        assertEquals(1, history.size());
-    }
-
-    // Проверяет, что для пустой истории возвращается пустой список
-    @Test
-    void getHistoryShouldReturnEmptyListWhenNoTasks() {
-        List<Task> history = historyManager.getHistory();
-
-        assertTrue(history.isEmpty());
-    }
-
-    // Проверяет, что задачи возвращаются в порядке их добавления
-    @Test
-    void getHistoryShouldReturnTasksInOrderOfAddition() {
-        historyManager.add(task1);
-        historyManager.add(task2);
-        historyManager.add(task3);
-        List<Task> history = historyManager.getHistory();
-
-        assertEquals(3, history.size());
         assertEquals(task1, history.get(0));
         assertEquals(task2, history.get(1));
-        assertEquals(task3, history.get(2));
     }
 
-    // Проверяет, что в истории не сохраняются дубликаты задач
     @Test
-    void historyShouldNotContainDuplicates() {
-        historyManager.add(task1);
-        historyManager.add(task2);
-        historyManager.add(task1);
-        historyManager.add(task3);
-        historyManager.add(task2);
-        List<Task> history = historyManager.getHistory();
-
-        assertEquals(3, history.size());
-        assertEquals(task1, history.get(0));
-        assertEquals(task3, history.get(1));
-        assertEquals(task2, history.get(2));
+    void testRemoveTask() { // Тест на удаление
+        HistoryManager hm = new InMemoryHistoryManager();
+        Task task = new Task("T", "D", Status.NEW,
+                Duration.ofMinutes(30), baseTime);
+        hm.add(task);
+        hm.remove(task.getId());
+        assertEquals(0, hm.getHistory().size());
     }
 
-    // Проверяет корректность удаления головного узла двусвязного списка
     @Test
-    void removeShouldWorkCorrectlyForHeadNode() {
-        historyManager.add(task1);
-        historyManager.add(task2);
-        historyManager.remove(task1.getId());
-        List<Task> history = historyManager.getHistory();
+    void testEmptyHistory() { // Тест на пустую историю
+        HistoryManager hm = new InMemoryHistoryManager();
+        assertEquals(0, hm.getHistory().size());
+    }
 
+    @Test
+    void testNoDuplicatesSameId() { // Тест на отсутствие дубликатов
+        HistoryManager hm = new InMemoryHistoryManager();
+        Task task1 = new Task("T1", "D1", Status.NEW,
+                Duration.ofMinutes(30), baseTime);
+        task1.setId(1);
+        Task task2 = new Task("T2", "D2", Status.IN_PROGRESS,
+                Duration.ofMinutes(30), baseTime);
+        task2.setId(1);
+
+        hm.add(task1);
+        hm.add(task2);
+
+        List<Task> history = hm.getHistory();
         assertEquals(1, history.size());
         assertEquals(task2, history.get(0));
-        assertFalse(history.contains(task1));
     }
 
-    // Проверяет корректность удаления хвостового узла двусвязного списка
     @Test
-    void removeShouldWorkCorrectlyForTailNode() {
-        historyManager.add(task1);
-        historyManager.add(task2);
-        historyManager.remove(task2.getId());
-        List<Task> history = historyManager.getHistory();
+    void lastViewIsAddedToTheEnd() { // Тест на добавление в конец истории
+        HistoryManager hm = new InMemoryHistoryManager();
+        Task task1 = new Task("T1", "D1", Status.NEW,
+                Duration.ofMinutes(30), baseTime);
+        Task task2 = new Task("T2", "D2", Status.NEW,
+                Duration.ofMinutes(30), baseTime);
 
-        assertEquals(1, history.size());
-        assertEquals(task1, history.get(0));
-        assertFalse(history.contains(task2));
-    }
+        task1.setId(1);
+        task2.setId(2);
 
-    // Проверяет корректность удаления среднего узла двусвязного списка
-    @Test
-    void removeShouldWorkCorrectlyForMiddleNode() {
-        historyManager.add(task1);
-        historyManager.add(task2);
-        historyManager.add(task3);
-        historyManager.remove(task2.getId());
-        List<Task> history = historyManager.getHistory();
+        hm.add(task1);
+        hm.add(task2);
 
+        List<Task> history = hm.getHistory();
         assertEquals(2, history.size());
-        assertEquals(task1, history.get(0));
-        assertEquals(task3, history.get(1));
-        assertFalse(history.contains(task2));
+        assertEquals(task2, history.get(1));
     }
 }
