@@ -1,6 +1,6 @@
 package exceptions;
 
-public class TimeConflictException extends RuntimeException {
+public class TimeConflictException extends Exception {
     public TimeConflictException(String message) {
         super(message);
     }

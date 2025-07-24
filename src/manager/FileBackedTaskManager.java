@@ -1,6 +1,7 @@
 package manager;
 
 import exceptions.ManagerSaveException;
+import exceptions.TimeConflictException;
 import model.Epic;
 import model.Subtask;
 import model.Task;
@@ -300,7 +301,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
      */
 
     @Override
-    public void addTask(Task task) {
+    public void addTask(Task task) throws TimeConflictException {
         super.addTask(task);
         save();
     }
@@ -312,13 +313,13 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
-    public void updateTask(Task task) {
+    public void updateTask(Task task) throws TimeConflictException {
         super.updateTask(task);
         save();
     }
 
     @Override
-    public void addSubtask(Subtask subtask) {
+    public void addSubtask(Subtask subtask) throws TimeConflictException {
         super.addSubtask(subtask);
         save();
     }
@@ -330,7 +331,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
-    public void updateSubtask(Subtask subtask) {
+    public void updateSubtask(Subtask subtask) throws TimeConflictException {
         super.updateSubtask(subtask);
         save();
     }
@@ -430,7 +431,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
             tempFile.deleteOnExit();
 
-        } catch (IOException e) {
+        } catch (IOException | TimeConflictException e) {
             System.out.println("Ошибка при работе с файлом: " + e.getMessage());
         }
     }

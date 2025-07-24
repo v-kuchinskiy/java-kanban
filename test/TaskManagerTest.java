@@ -26,7 +26,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
      * Проверка корректности расчета статуса эпика в зависимости от статуса подзадач.
      */
     @Test
-    public void testEpicStatusCalculation() {
+    public void testEpicStatusCalculation() throws TimeConflictException {
         Epic epic = new Epic("E", "D");
         manager.addEpic(epic);
 
@@ -58,7 +58,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
      * будет выброшено исключение.
      */
     @Test
-    public void testTimeOverlap() {
+    public void testTimeOverlap() throws TimeConflictException {
         Task task1 = new Task("T1", "D1", Status.NEW,
                 Duration.ofHours(1), baseTime);
         manager.addTask(task1);
@@ -71,7 +71,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
      * Проверка, что deleteAllTasks() корректно очищает список всех задач.
      */
     @Test
-    void testDeleteAllTasks() {
+    void testDeleteAllTasks() throws TimeConflictException {
         Task task1 = new Task("T1", "D1");
         Task task2 = new Task("T2", "D2");
         manager.addTask(task1);

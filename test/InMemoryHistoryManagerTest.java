@@ -1,3 +1,4 @@
+import exceptions.TimeConflictException;
 import manager.HistoryManager;
 import manager.InMemoryHistoryManager;
 import manager.InMemoryTaskManager;
@@ -16,7 +17,7 @@ public class InMemoryHistoryManagerTest {
     LocalDateTime baseTime = TestData.BASE_TIME;
 
     @Test
-    void historyKeepsPreviousTaskVersions() { // Тест на сохранение предыдущей версии
+    void historyKeepsPreviousTaskVersions() throws TimeConflictException { // Тест на сохранение предыдущей версии
         HistoryManager hm = new InMemoryHistoryManager();
         InMemoryTaskManager tm = new InMemoryTaskManager(hm);
 

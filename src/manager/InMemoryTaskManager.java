@@ -17,7 +17,7 @@ public class InMemoryTaskManager implements TaskManager {
     private final HistoryManager historyManager;
 
     private boolean isUpdatingStatus = false;
-    private final TreeSet<Task> prioritizedTasks = new TreeSet<>(
+    private final Set<Task> prioritizedTasks = new TreeSet<>(
             Comparator.comparing(
                     Task::getStartTime,
                     Comparator.nullsLast(Comparator.naturalOrder())
@@ -109,7 +109,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void addTask(Task task) {
+    public void addTask(Task task) throws TimeConflictException {
         if (hasTimeOverlap(task)) {
             throw new TimeConflictException("Задача пересекается по времени с существующей.");
         }
@@ -121,9 +121,9 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void addSubtask(Subtask subtask) {
+    public void addSubtask(Subtask subtask) throws TimeConflictException {
         if (hasTimeOverlap(subtask)) {
-            throw new TimeConflictException("Подзадача пересекается по времени");
+            throw new TimeConflictException("Подзадача пересекается по времени с существующей.");
         }
         subtask.setId(generateId());
         if (subtask.getEpicId() == subtask.getId()) {
@@ -174,7 +174,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void updateTask(Task task) {
+    public void updateTask(Task task) throws TimeConflictException {
         if (hasTimeOverlap(task)) {
             throw new TimeConflictException("Задача пересекается по времени с существующей.");
         }
@@ -186,7 +186,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void updateSubtask(Subtask subtask) {
+    public void updateSubtask(Subtask subtask) throws TimeConflictException {
         Subtask old = subtasks.get(subtask.getId());
         if (old != null && !old.equals(subtask)) {
             if (hasTimeOverlap(subtask)) {

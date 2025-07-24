@@ -1,5 +1,6 @@
 package manager;
 
+import exceptions.TimeConflictException;
 import model.Epic;
 import model.Subtask;
 import model.Task;
@@ -30,17 +31,17 @@ public interface TaskManager {
 
     List<Task> getPrioritizedTasks();
 
-    void addTask(Task task);
+    void addTask(Task task) throws TimeConflictException;
 
-    void addSubtask(Subtask subtask);
+    void addSubtask(Subtask subtask) throws TimeConflictException;
 
     void addEpic(Epic epic);
 
     void updateEpicStatus(int epicId);
 
-    void updateTask(Task task);
+    void updateTask(Task task) throws TimeConflictException;
 
-    void updateSubtask(Subtask subtask);
+    void updateSubtask(Subtask subtask) throws TimeConflictException;
 
     void updateEpic(Epic epic);
 

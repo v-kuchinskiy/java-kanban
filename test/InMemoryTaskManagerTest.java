@@ -1,3 +1,4 @@
+import exceptions.TimeConflictException;
 import manager.InMemoryTaskManager;
 import model.Epic;
 import model.Subtask;
@@ -24,7 +25,7 @@ class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager> {
     }
 
     @Test
-    void addAllTaskTypesAndFindsById() {
+    void addAllTaskTypesAndFindsById() throws TimeConflictException {
         InMemoryTaskManager tm = new InMemoryTaskManager();
 
         // Создаём задачи
@@ -52,7 +53,7 @@ class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager> {
     }
 
     @Test
-    void testNoIdConflicts() {
+    void testNoIdConflicts() throws TimeConflictException {
         InMemoryTaskManager tm = new InMemoryTaskManager();
         Task task1 = new Task("T1", "D1", Status.NEW,
                 Duration.ofMinutes(30), baseTime);
@@ -70,7 +71,7 @@ class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager> {
     }
 
     @Test
-    void taskUnchangedAfterAdding() {
+    void taskUnchangedAfterAdding() throws TimeConflictException {
         InMemoryTaskManager tm = new InMemoryTaskManager();
         Subtask sub1 = new Subtask("S1", "D1", Status.NEW, 2,
                 Duration.ofMinutes(30), baseTime);
@@ -86,7 +87,7 @@ class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager> {
     }
 
     @Test
-    void testUniqueIdGeneration() {
+    void testUniqueIdGeneration() throws TimeConflictException {
         InMemoryTaskManager tm = new InMemoryTaskManager();
         Task task1 = new Task("T1", "D1", Status.NEW,
                 Duration.ofMinutes(30), baseTime);
@@ -98,7 +99,7 @@ class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager> {
     }
 
     @Test
-    void testGetPrioritizedTasks_SortsByStartTime() {
+    void testGetPrioritizedTasks_SortsByStartTime() throws TimeConflictException {
         InMemoryTaskManager tm = new InMemoryTaskManager();
         Task t1 = new Task("T1", "D1", Status.NEW, Duration.ofMinutes(30), baseTime.plusHours(2));
         Task t2 = new Task("T2", "D2", Status.NEW, Duration.ofMinutes(30), baseTime);
