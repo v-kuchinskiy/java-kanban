@@ -1,41 +1,11 @@
-import manager.Managers;
 import manager.TaskManager;
-import model.Epic;
-import model.Status;
-import model.Subtask;
 import model.Task;
+import util.Managers;
 
 public class Main {
     public static void main(String[] args) {
         TaskManager taskManager = Managers.getDefault();
 
-        Task task1 = new Task("Убраться в комнате", "Разложить все вещи", Status.DONE);
-        taskManager.addTask(task1);
-
-        Task task2 = new Task("Сходить в магазин", "Составить список", Status.NEW);
-        taskManager.addTask(task2);
-
-        Epic epic1 = new Epic("Приготовить завтрак", "Завтра утром");
-        taskManager.addEpic(epic1);
-
-        Subtask subtask1 = new Subtask("Достать продукты из холодильника",
-                "Только нужные ингредиенты",
-                Status.DONE, epic1.getId());
-        taskManager.addSubtask(subtask1);
-
-        Subtask subtask2 = new Subtask("Помыть посуду", "После завтрака",
-                Status.IN_PROGRESS, epic1.getId());
-        taskManager.addSubtask(subtask2);
-
-        Epic epic2 = new Epic("Собраться на работу", "Встать пораньше");
-        taskManager.addEpic(epic2);
-
-        Subtask subtask3 = new Subtask("Выбрать одежду по погоде",
-                "Утром может быть прохладно",
-                Status.NEW, epic2.getId());
-        taskManager.addSubtask(subtask3);
-
-        printAllTasks(taskManager);
     }
 
     private static void printAllTasks(TaskManager taskManager) {

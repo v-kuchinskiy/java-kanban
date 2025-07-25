@@ -1,5 +1,6 @@
 package manager;
 
+import exceptions.TimeConflictException;
 import model.Epic;
 import model.Subtask;
 import model.Task;
@@ -24,21 +25,23 @@ public interface TaskManager {
 
     Subtask getSubtaskById(int id);
 
-    List<Subtask> getAllSubtasksByEpicId(int epicId);
-
     Epic getEpicById(int id);
 
-    void addTask(Task task);
+    List<Task> getHistory();
 
-    void addSubtask(Subtask subtask);
+    List<Task> getPrioritizedTasks();
+
+    void addTask(Task task) throws TimeConflictException;
+
+    void addSubtask(Subtask subtask) throws TimeConflictException;
 
     void addEpic(Epic epic);
 
     void updateEpicStatus(int epicId);
 
-    void updateTask(Task task);
+    void updateTask(Task task) throws TimeConflictException;
 
-    void updateSubtask(Subtask subtask);
+    void updateSubtask(Subtask subtask) throws TimeConflictException;
 
     void updateEpic(Epic epic);
 
@@ -48,5 +51,7 @@ public interface TaskManager {
 
     void deleteEpic(int id);
 
-    List<Task> getHistory();
+    boolean hasTimeOverlap(Task task);
+
+    List<Subtask> getAllSubtasksByEpicId(int epicId);
 }
